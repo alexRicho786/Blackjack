@@ -6,6 +6,7 @@
 #player personalities
 from card import Card
 from hand import Hand
+from time import sleep
 import random
 import pygame
 
@@ -24,6 +25,7 @@ bg = mainimg
 #default options
 shuffle_count = 100000
 deck_size = 8
+hands = []
 
 game = True
 deck = []
@@ -71,8 +73,20 @@ def textWrite(text, size, color, x, y):
 
 def redrawWindow():
     win.blit(bg, [0, 0])
-    textWrite(str(hand.printHand()).strip("[]"), 60, (255,255,255), 400, 540)
-    textWrite("Value: " + str(hand.getHandValue()), 60, (255,255,255), 400, 600)
+    #dealer
+    textWrite("Dealer", 60, (255,255,255), 400, 40)
+    textWrite(str(hands[1].printHand()).strip("[]"), 60, (255,255,255), 400, 100)
+    #player
+    textWrite(str(hands[0].printHand()).strip("[]"), 60, (255,255,255), 400, 540)
+    textWrite("Value: " + str(hands[0].getHandValue()), 60, (255,255,255), 400, 600)
+    #bust stuff
+    if  hands[0].bust == True:
+        textWrite("Bust", 60, (255,255,255), 400, 400)
+        pygame.display.update()
+        sleep(3)
+        resetDeck(2)
+        startHand()
+        hands[0].bust = False
     pygame.display.update()
 
 
@@ -84,17 +98,28 @@ def input(eventtype, x1, x2, y1 ,y2):
             if y1 < my < y2:
                 return True
 
-createDeck()
-shuffle(deck)
 
-# The following shows how to create a hand, deal it 4
-# cards and then print out the hand and the value of it
-hand = Hand()
+def resetDeck(two):
+    hands.clear()
+    deck.clear()
+    createDeck()
+    shuffle(deck)
+    for i in range(two):
+        hands.append(Hand())
 
-for i in range(2):
-    hand.addCard(deck[0])
-    print(deck[0].value, end=" ")
-    deck.pop(0)
+
+def startHand():
+    for hand in hands:
+        for i in range(2):
+            hand.addCard(deck[0])
+            deck.pop(0)
+
+
+#The following shows how to creates two hand objects
+#for the dealer and player, then deals two cards
+
+resetDeck(2)
+startHand()
 
 while game == True:
 
@@ -109,8 +134,9 @@ while game == True:
                 quit()
 
         if input(pygame.MOUSEBUTTONDOWN, 375, 425, 650, 700) == True:
-            hand.addCard(deck[0])
-            print(deck[0].value, end=" ")
-            deck.pop(0)
+            if hands[0].getHandValue() < 21:
+                hands[0].addCard(deck[0])
+                deck.pop(0)
 
+    hands[0].checkbust()
     redrawWindow()

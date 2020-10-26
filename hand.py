@@ -4,6 +4,8 @@ class Hand:
     def __init__(self):
         self.cards = []
         self.hand = []
+        self.bust = False
+
 
     def addCard(self, c):
         self.cards.append(c)
@@ -36,3 +38,18 @@ class Hand:
         for c in self.cards:
             self.hand.append(c.suit + c.face)
         return self.hand
+
+
+    def checkbust(self):
+        if self.getHandValue() > 21:
+            self.bust = True
+    
+    def clearCards(self):
+        self.cards.clear()
+        self.hand.clear()
+
+    #def checkwin(self):
+    #   if self.getHandValue == 21:
+
+    #def stand(self):
+
