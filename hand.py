@@ -5,6 +5,9 @@ class Hand:
         self.cards = []
         self.hand = []
         self.bust = False
+        self.win = False
+        self.stand = False
+        self.money = 0
 
 
     def addCard(self, c):
@@ -40,16 +43,30 @@ class Hand:
         return self.hand
 
 
-    def checkbust(self):
+    def checkBust(self):
         if self.getHandValue() > 21:
             self.bust = True
+
+
+    def checkWin(self):
+       if self.getHandValue() == 21:
+           self.stand = True
     
+
     def clearCards(self):
         self.cards.clear()
         self.hand.clear()
 
-    #def checkwin(self):
-    #   if self.getHandValue == 21:
 
-    #def stand(self):
+    def checkStand(self):
+        self.stand = True
 
+
+    #when player stands this determines
+    #how the other players play
+    def multipleHits(self, limit):
+        if self.getHandValue() < limit:
+            return True
+        else:
+            return False
+        

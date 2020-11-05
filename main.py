@@ -26,6 +26,7 @@ bg = mainimg
 shuffle_count = 100000
 deck_size = 8
 hands = []
+dealerLimit = 18
 
 game = True
 deck = []
@@ -72,21 +73,50 @@ def textWrite(text, size, color, x, y):
 
 
 def redrawWindow():
+    #general
     win.blit(bg, [0, 0])
     #dealer
     textWrite("Dealer", 60, (255,255,255), 400, 40)
     textWrite(str(hands[1].printHand()).strip("[]"), 60, (255,255,255), 400, 100)
+    textWrite("Value: " + str(hands[1].getHandValue()), 60, (255,255,255), 400, 160)
     #player
     textWrite(str(hands[0].printHand()).strip("[]"), 60, (255,255,255), 400, 540)
     textWrite("Value: " + str(hands[0].getHandValue()), 60, (255,255,255), 400, 600)
-    #bust stuff
+    #bust
     if  hands[0].bust == True:
-        textWrite("Bust", 60, (255,255,255), 400, 400)
+        textWrite("Bust!", 60, (255,255,255), 400, 400)
         pygame.display.update()
         sleep(3)
         resetDeck(2)
         startHand()
         hands[0].bust = False
+    #stand/win
+    if hands[0].stand == True:
+        textWrite("Dealer's Turn!", 60, (255,255,255), 400, 400)
+        pygame.display.update()
+        sleep(3)
+        if hands[1].multipleHits(dealerLimit) == True:
+            hands[1].addCard(deck[0])
+            deck.pop(0)
+        else:
+            #win
+            if hands[0].getHandValue() > hands[1].getHandValue():
+                textWrite("You Win!", 60, (255,255,255), 400, 460)
+                pygame.display.update()
+                sleep(3)
+            #lose
+            elif hands[0].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
+                textWrite("You Lose!", 60, (255,255,255), 400, 460)
+                pygame.display.update()
+                sleep(3)
+            #tie
+            else:
+                textWrite("Tie!", 60, (255,255,255), 400, 460)
+                pygame.display.update()
+                sleep(3)
+            resetDeck(2)
+            startHand()
+            hands[0].stand = False
     pygame.display.update()
 
 
@@ -99,12 +129,12 @@ def input(eventtype, x1, x2, y1 ,y2):
                 return True
 
 
-def resetDeck(two):
+def resetDeck(number):
     hands.clear()
     deck.clear()
     createDeck()
     shuffle(deck)
-    for i in range(two):
+    for i in range(number):
         hands.append(Hand())
 
 
@@ -120,6 +150,7 @@ def startHand():
 
 resetDeck(2)
 startHand()
+hands[0].money = 1000
 
 while game == True:
 
@@ -133,10 +164,15 @@ while game == True:
                 pygame.quit()
                 quit()
 
-        if input(pygame.MOUSEBUTTONDOWN, 375, 425, 650, 700) == True:
-            if hands[0].getHandValue() < 21:
+        elif input(pygame.MOUSEBUTTONDOWN, 350, 450, 650, 700) == True:
+            if hands[0].getHandValue() < 21 and hands[0].stand == False:
                 hands[0].addCard(deck[0])
                 deck.pop(0)
+        
+        elif input(pygame.MOUSEBUTTONDOWN, 475, 575, 650, 700) == True:
+            print("hi")
+            hands[0].checkStand()
 
-    hands[0].checkbust()
+    hands[0].checkBust()
+    hands[0].checkWin()
     redrawWindow()
