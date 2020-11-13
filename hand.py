@@ -7,7 +7,6 @@ class Hand:
         self.bust = False
         self.win = False
         self.stand = False
-        self.money = 0
 
 
     def addCard(self, c):

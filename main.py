@@ -19,16 +19,19 @@ pygame.display.set_caption("Blackjack")
 clock = pygame.time.Clock()
 
 #images
-mainimg = pygame.image.load("main.png")
-bg = mainimg
+mainImg = pygame.image.load("main.png")
+betImg = pygame.image.load("bet.png")
+bg = mainImg
 
 #default options
 shuffle_count = 100000
 deck_size = 8
 hands = []
 dealerLimit = 18
-
+bet = 0
 game = True
+money = 1000
+
 deck = []
 suits = ["S","C","H","D"]
 faces = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
@@ -73,6 +76,7 @@ def textWrite(text, size, color, x, y):
 
 
 def redrawWindow():
+    global money
     #general
     win.blit(bg, [0, 0])
     #dealer
@@ -82,11 +86,14 @@ def redrawWindow():
     #player
     textWrite(str(hands[0].printHand()).strip("[]"), 60, (255,255,255), 400, 540)
     textWrite("Value: " + str(hands[0].getHandValue()), 60, (255,255,255), 400, 600)
+    textWrite("Money: " + str(money), 60, (255,255,255), 650, 40)
     #bust
     if  hands[0].bust == True:
         textWrite("Bust!", 60, (255,255,255), 400, 400)
         pygame.display.update()
         sleep(3)
+        money = money - bet
+        makeBet()
         resetDeck(2)
         startHand()
         hands[0].bust = False
@@ -100,28 +107,27 @@ def redrawWindow():
             deck.pop(0)
         else:
             #win
-            if hands[0].getHandValue() > hands[1].getHandValue():
+            if hands[0].getHandValue() > hands[1].getHandValue() or hands[1].getHandValue() > 21:
                 textWrite("You Win!", 60, (255,255,255), 400, 460)
-                pygame.display.update()
-                sleep(3)
+                money = money + bet
             #lose
             elif hands[0].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
                 textWrite("You Lose!", 60, (255,255,255), 400, 460)
-                pygame.display.update()
-                sleep(3)
+                money = money - bet
             #tie
             else:
                 textWrite("Tie!", 60, (255,255,255), 400, 460)
-                pygame.display.update()
-                sleep(3)
+            pygame.display.update()
+            sleep(3)
+            makeBet()
             resetDeck(2)
             startHand()
             hands[0].stand = False
     pygame.display.update()
 
 
-def input(eventtype, x1, x2, y1 ,y2):
-    x, my = pygame.mouse.get_pos()
+def input(eventtype, event, x1, x2, y1 ,y2):
+    mx, my = pygame.mouse.get_pos()
     keys = pygame.key.get_pressed()
     if event.type == eventtype:
         if x1 < mx < x2:
@@ -145,12 +151,52 @@ def startHand():
             deck.pop(0)
 
 
+def makeBet():
+    global bet
+    win.blit(betImg, [0, 0])
+    textWrite("Make Your Bet!", 60, (255,255,255), 400, 460)
+    chooseBet = True
+    pygame.display.update()
+    
+    while chooseBet == True:
+
+        clock.tick(27)
+        mx, my = pygame.mouse.get_pos()
+        keys = pygame.key.get_pressed()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                    chooseBet = False
+                    pygame.quit()
+                    quit()
+
+            elif input(pygame.MOUSEBUTTONDOWN, event, 100, 200, 650, 700) == True:
+                bet = 10
+                chooseBet = False
+
+            elif input(pygame.MOUSEBUTTONDOWN, event, 225, 325, 650, 700) == True:
+                bet = 20
+                chooseBet = False
+
+            elif input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 650, 700) == True:
+                bet = 50
+                chooseBet = False
+            
+            elif input(pygame.MOUSEBUTTONDOWN, event, 475, 575, 650, 700) == True:
+                bet = 100
+                chooseBet = False
+            
+            elif input(pygame.MOUSEBUTTONDOWN, event, 600, 700, 650, 700) == True:
+                bet = 200
+                chooseBet ==False
+
+
 #The following shows how to creates two hand objects
 #for the dealer and player, then deals two cards
 
 resetDeck(2)
 startHand()
-hands[0].money = 1000
+makeBet()
 
 while game == True:
 
@@ -164,13 +210,12 @@ while game == True:
                 pygame.quit()
                 quit()
 
-        elif input(pygame.MOUSEBUTTONDOWN, 350, 450, 650, 700) == True:
+        if input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 650, 700) == True:
             if hands[0].getHandValue() < 21 and hands[0].stand == False:
                 hands[0].addCard(deck[0])
                 deck.pop(0)
         
-        elif input(pygame.MOUSEBUTTONDOWN, 475, 575, 650, 700) == True:
-            print("hi")
+        elif input(pygame.MOUSEBUTTONDOWN, event, 475, 575, 650, 700) == True:
             hands[0].checkStand()
 
     hands[0].checkBust()
