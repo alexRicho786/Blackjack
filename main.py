@@ -1,9 +1,9 @@
 #stuff to add
-#from dealer hand append hand to a list and have one of them
-#working inputs
+#win if player has 5 cards
+#display the fith cards(ordering might be fucked?)
 #opening screen
 #dealer personalities
-#player personalities
+#players + personalities
 from card import Card
 from hand import Hand
 from time import sleep
@@ -21,7 +21,10 @@ clock = pygame.time.Clock()
 #images
 mainImg = pygame.image.load("main.png")
 betImg = pygame.image.load("bet.png")
+cardTemplate = pygame.image.load("card.png")
 bg = mainImg
+cardTemplateY = 142.03/2
+cardTemplateX = 87.885/2
 
 #default options
 shuffle_count = 100000
@@ -81,12 +84,20 @@ def redrawWindow():
     win.blit(bg, [0, 0])
     #dealer
     textWrite("Dealer", 60, (255,255,255), 400, 40)
-    textWrite(str(hands[1].printHand()).strip("[]"), 60, (255,255,255), 400, 100)
-    textWrite("Value: " + str(hands[1].getHandValue()), 60, (255,255,255), 400, 160)
+    showCards(1, 160)
+    #textWrite(str(hands[1].printHand()).strip("[]"), 60, (255,255,255), 400, 100)
+    #textWrite("Value: " + str(hands[1].getHandValue()), 60, (255,255,255), 400, 160)
     #player
-    textWrite(str(hands[0].printHand()).strip("[]"), 60, (255,255,255), 400, 540)
-    textWrite("Value: " + str(hands[0].getHandValue()), 60, (255,255,255), 400, 600)
+    #textWrite(str(hands[0].printHand()).strip("[]"), 60, (255,255,255), 400, 540)
+    #textWrite("Value: " + str(hands[0].getHandValue()), 60, (255,255,255), 400, 600)
     textWrite("Money: " + str(money), 60, (255,255,255), 650, 40)
+    showCards(0, 550)
+    playerEvent()
+    pygame.display.update()
+
+
+def playerEvent():
+    global money
     #bust
     if  hands[0].bust == True:
         textWrite("Bust!", 60, (255,255,255), 400, 400)
@@ -191,9 +202,34 @@ def makeBet():
                 chooseBet ==False
 
 
+def showCards(handNum, cardY):
+    cardAmount = len(hands[handNum].cards)
+    hands[handNum].printHand()
+    if cardAmount == 2:
+        win.blit(cardTemplate, (350-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (450-cardTemplateX,cardY-cardTemplateY))
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 350, cardY)
+        textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 450, cardY)
+    elif cardAmount == 3:
+        win.blit(cardTemplate, (300-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (400-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (500-cardTemplateX,cardY-cardTemplateY))
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 300, cardY)
+        textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 400, cardY)
+        textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 500, cardY)
+    elif cardAmount == 4:
+        win.blit(cardTemplate, (250-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (350-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (450-cardTemplateX,cardY-cardTemplateY))
+        win.blit(cardTemplate, (550-cardTemplateX,cardY-cardTemplateY))
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 250, cardY)
+        textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 350, cardY)
+        textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 450, cardY)
+        textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 550, cardY)
+
+
 #The following shows how to creates two hand objects
 #for the dealer and player, then deals two cards
-
 resetDeck(2)
 startHand()
 makeBet()

@@ -40,7 +40,7 @@ class Hand:
         for c in self.cards:
             self.hand.append(c.suit + c.face)
         return self.hand
-
+        
 
     def checkBust(self):
         if self.getHandValue() > 21:
