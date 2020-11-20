@@ -7,6 +7,10 @@ class Hand:
         self.bust = False
         self.win = False
         self.stand = False
+        self.forfeit = False
+        self.double = False
+        self.split = False
+        self.hasSplit = False
 
 
     def addCard(self, c):
@@ -40,7 +44,6 @@ class Hand:
         for c in self.cards:
             self.hand.append(c.suit + c.face)
         return self.hand
-        
 
     def checkBust(self):
         if self.getHandValue() > 21:
@@ -59,6 +62,18 @@ class Hand:
 
     def checkStand(self):
         self.stand = True
+
+
+    def checkForfeit(self):
+        self.forfeit = True
+    
+
+    def checkDouble(self):
+        self.double = True
+
+
+    def checkSplit(self):
+        self.split = True
 
 
     #when player stands this determines
