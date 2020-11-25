@@ -37,6 +37,11 @@ class Hand:
                         hand_value -= 10
 
         return hand_value
+    
+    #if players hand gets to 5
+    def handFive(self):
+        if len(self.cards) == 5:
+            return True
 
 
     def printHand(self):

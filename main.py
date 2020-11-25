@@ -1,7 +1,7 @@
-#stuff to add
+#stuff to add + issues
 #win if player has 5 cards
-#display the fith cards
-#personalities
+#split conditions: money + card
+#dealer not hiding card
 from card import Card
 from hand import Hand
 from time import sleep
@@ -32,7 +32,7 @@ hands = []
 dealerLimit = 18
 harmonLimit = 20
 maxwellLimit = 16
-bet = 0
+bet = 50
 game = True
 opening = True
 currentEvent = "Your Turn!"
@@ -86,7 +86,7 @@ def redrawWindow():
     textWrite(currentEvent, 60, (255,255,255), 150, 40)
     #dealer
     textWrite("Dealer", 60, (255,255,255), 400, 40)
-    showCards(1, 160, 0)
+    showCards(1, 180, 0)
     #player
     textWrite("Cash: " + str(money), 60, (255,255,255), 650, 40)
     showCards(0, 580, 0)
@@ -109,7 +109,7 @@ def playerEvent():
     #bust
     if  hands[currentHand].bust == True:
         currentEvent = "Bust!"
-        textWrite(currentEvent, 60, (255,255,255), 150, 40)
+        textWrite(currentEvent, 60, (255,255,255), 150, 70)
         pygame.display.update()
         sleep(2)
         money = money - bet
@@ -129,7 +129,7 @@ def playerEvent():
             currentHand = -1
             hands[0].stand = False
             currentEvent = "Stand!"
-            textWrite(currentEvent, 60, (255,255,255), 150, 40)
+            textWrite(currentEvent, 60, (255,255,255), 150, 70)
             pygame.display.update()
             sleep(2)
         elif hands[0].hasSplit == False or currentHand == -1:
@@ -172,7 +172,7 @@ def playerEvent():
     #forfeit
     if hands[currentHand].forfeit == True:
         currentEvent = "Forfeit!"
-        textWrite(currentEvent, 60, (255,255,255), 150, 40)
+        textWrite(currentEvent, 60, (255,255,255), 150, 70)
         money = money - bet/2
         pygame.display.update()
         sleep(2)
@@ -187,7 +187,7 @@ def playerEvent():
     #double
     if hands[currentHand].double == True:
         currentEvent = "Double!"
-        textWrite(currentEvent, 60, (255,255,255), 150, 40)
+        textWrite(currentEvent, 60, (255,255,255), 150, 70)
         bet = bet*2
         hands[currentHand].addCard(deck[0])
         deck.pop(0)
@@ -200,7 +200,7 @@ def playerEvent():
     if hands[0].hasSplit == False:
         if hands[0].split == True:
             currentEvent = "Split!"
-            textWrite(currentEvent, 60, (255,255,255), 150, 40)
+            textWrite(currentEvent, 60, (255,255,255), 150, 70)
             pygame.display.update()
             sleep(2)
             hands.append(Hand())
@@ -208,6 +208,10 @@ def playerEvent():
             del hands[0].cards[1]
             hands[0].hasSplit = True
             hands[0].split = False
+
+
+#player
+#def win():
 
 
 #function for input events in pygame
@@ -220,7 +224,7 @@ def input(eventtype, event, x1, x2, y1 ,y2):
                 return True
 
 
-#reset the deck
+#resets the deck
 def resetDeck(number):
     hands.clear()
     deck.clear()
@@ -238,9 +242,11 @@ def startHand():
             deck.pop(0)
 
 
-#make a bet
+#screen for player to make bets and determine computer players personality
 def makeBet():
     global bet
+    global dealerLimit
+    global maxwellLimit
     win.blit(betImg, [0, 0])
     chooseBet = True
     pygame.display.update()
@@ -252,30 +258,46 @@ def makeBet():
         keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
+            #print(mx, my)
             if event.type == pygame.QUIT:
                     chooseBet = False
                     pygame.quit()
                     quit()
 
-            elif input(pygame.MOUSEBUTTONDOWN, event, 100, 200, 650, 700) == True:
+            #start button
+            elif input(pygame.MOUSEBUTTONDOWN, event, 200, 600, 400, 580) == True:
+                chooseBet = False
+
+            #different bet buttons
+            elif input(pygame.MOUSEBUTTONDOWN, event, 50, 150, 630, 730) == True:
                 bet = 10
-                chooseBet = False
-
-            elif input(pygame.MOUSEBUTTONDOWN, event, 225, 325, 650, 700) == True:
+                print(bet)
+            elif input(pygame.MOUSEBUTTONDOWN, event, 200, 300, 630, 730) == True:
                 bet = 20
-                chooseBet = False
-
-            elif input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 650, 700) == True:
+                print(bet)
+            elif input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 630, 730) == True:
                 bet = 50
-                chooseBet = False
-            
-            elif input(pygame.MOUSEBUTTONDOWN, event, 475, 575, 650, 700) == True:
+                print(bet)
+            elif input(pygame.MOUSEBUTTONDOWN, event, 500, 600, 630, 730) == True:
                 bet = 100
-                chooseBet = False
-            
-            elif input(pygame.MOUSEBUTTONDOWN, event, 600, 700, 650, 700) == True:
+            elif input(pygame.MOUSEBUTTONDOWN, event, 650, 750, 630, 730) == True:
                 bet = 200
-                chooseBet = False
+            #different personalities
+            #dealer
+            elif input(pygame.MOUSEBUTTONDOWN, event, 310, 410, 125, 205) == True:
+                dealerLimit = 20
+            elif input(pygame.MOUSEBUTTONDOWN, event, 470, 570, 125, 205) == True:
+                dealerLimit = 18
+            elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 125, 205) == True:
+                dealerLimit = 16
+            #maxwell
+            elif input(pygame.MOUSEBUTTONDOWN, event, 310, 410, 265, 355) == True:
+                maxwellLimit = 20
+            elif input(pygame.MOUSEBUTTONDOWN, event, 470, 570, 265, 355) == True:
+                maxwellLimit = 18
+            elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 265, 355) == True:
+                maxwellLimit = 16
+
 
 
 def showCards(handNum, cardY, center):
@@ -305,6 +327,17 @@ def showCards(handNum, cardY, center):
         textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 355-center, cardY)
         textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 445-center, cardY)
         textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 535-center, cardY)
+    elif cardAmount == 5:
+        win.blit(cardTemplate, (260-cardTemplateX-center,cardY-cardTemplateY))
+        win.blit(cardTemplate, (330-cardTemplateX-center,cardY-cardTemplateY))
+        win.blit(cardTemplate, (400-cardTemplateX-center,cardY-cardTemplateY))
+        win.blit(cardTemplate, (470-cardTemplateX-center,cardY-cardTemplateY))
+        win.blit(cardTemplate, (540-cardTemplateX-center,cardY-cardTemplateY))
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 260-center, cardY)
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 330-center, cardY)
+        textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 400-center, cardY)
+        textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 470-center, cardY)
+        textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 540-center, cardY)
 
 
 while opening == True:
@@ -353,13 +386,15 @@ while game == True:
             if hands[currentHand].getHandValue() < 21 and hands[currentHand].stand == False:
                 hands[currentHand].addCard(deck[0])
                 deck.pop(0)
+                if hands[currentHand].handFive() == True:
+                    win()
         
         #stand
         elif input(pygame.MOUSEBUTTONDOWN, event, 475, 575, 650, 700) == True:
             hands[currentHand].checkStand()
 
         #forfeit
-        elif input(pygame.MOUSEBUTTONDOWN, event, 600, 700, 650, 700) == True:
+        elif input(pygame.MOUSEBUTTONDOWN, event, 650, 750, 650, 700) == True:
             hands[currentHand].checkForfeit()
 
     hands[currentHand].checkBust()
