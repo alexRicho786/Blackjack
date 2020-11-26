@@ -1,7 +1,7 @@
 #stuff to add + issues
-#win if player has 5 cards
-#split conditions: money + card
 #dealer not hiding card
+#pygame.draw.rect(win, (0,255,0),(50, 730, 100, 10))
+#pygame.display.update()
 from card import Card
 from hand import Hand
 from time import sleep
@@ -147,20 +147,63 @@ def playerEvent():
                     hands[1].addCard(deck[0])
                     deck.pop(0)
             else:
-                #win
-                if hands[currentHand].getHandValue() > hands[1].getHandValue() or hands[1].getHandValue() > 21:
-                    currentEvent = "You Win!"
-                    textWrite(currentEvent, 60, (255,255,255), 150, 100)
-                    money = money + bet
-                #lose
-                elif hands[currentHand].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
-                    currentEvent = "You Lose!"
-                    textWrite(currentEvent, 60, (255,255,255), 150, 100)
-                    money = money - bet
-                #tie
+                if hands[0].hasSplit == False:
+                    #win
+                    if hands[currentHand].getHandValue() > hands[1].getHandValue() or hands[1].getHandValue() > 21:
+                        currentEvent = "You Win!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money + bet
+                    #lose
+                    elif hands[currentHand].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
+                        currentEvent = "You Lose!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money - bet
+                    #tie
+                    else:
+                        currentEvent = "Tie!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                #calculates winnings if the player has split with both hands standing
                 else:
-                    currentEvent = "Tie!"
-                    textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                    splitTie = True
+                    #win x 2
+                    if hands[0].getHandValue() > hands[1].getHandValue() or hands[1].getHandValue() > 21:
+                        if hands[currentHand].getHandValue() > hands[1].getHandValue() or hands[1].getHandValue() > 21:
+                            currentEvent = "You Win!"
+                            textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                            money = money + bet*2
+                            splitTie = False
+                    #lose x 2
+                    elif hands[0].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
+                        if hands[currentHand].getHandValue() < hands[1].getHandValue() and hands[1].getHandValue() < 22:
+                            currentEvent = "You Lose!"
+                            textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                            money = money - bet*2
+                            splitTie = False
+                    #win x 1
+                    if hands[0].getHandValue() > hands[1].getHandValue() and hands[currentHand].getHandValue() == hands[1].getHandValue():
+                        currentEvent = "You Win!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money + bet
+                    #win x 1
+                    elif hands[currentHand].getHandValue() > hands[1].getHandValue() and hands[0].getHandValue() == hands[1].getHandValue():
+                        currentEvent = "You Win!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money + bet
+                    #lose x 1
+                    elif hands[0].getHandValue() < hands[1].getHandValue() and hands[currentHand].getHandValue() == hands[1].getHandValue():
+                        currentEvent = "You Lose!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money - bet
+                    #lose x 1
+                    elif hands[currentHand].getHandValue() < hands[1].getHandValue() and hands[0].getHandValue() == hands[1].getHandValue():
+                        currentEvent = "You Lose!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+                        money = money - bet
+                    #tie - tie - one wine one lose
+                    elif splitTie == True:
+                        currentEvent = "Tie!"
+                        textWrite(currentEvent, 60, (255,255,255), 150, 100)
+
                 pygame.display.update()
                 hands[currentHand].stand = False
                 currentHand = 0
@@ -210,9 +253,26 @@ def playerEvent():
             hands[0].split = False
 
 
-#player
-#def win():
-
+#when player has five cards
+def winGame():
+    global money
+    if hands[0].split == False or currentHand == -1:
+        currentEvent = "You Win - 5 cards!"
+        textWrite(currentEvent, 60, (255,255,255), 150, 70)
+        money = money + bet
+        pygame.display.update()
+        sleep(2)
+        currentHand = 0
+        resetDeck(4)
+        startHand()
+        makeBet()
+    else:
+        currentEvent = "You Win - 5 cards!"
+        textWrite(currentEvent, 60, (255,255,255), 150, 70)
+        money = money + bet
+        pygame.display.update()
+        sleep(2)
+        currentHand = -1
 
 #function for input events in pygame
 def input(eventtype, event, x1, x2, y1 ,y2):
@@ -271,13 +331,10 @@ def makeBet():
             #different bet buttons
             elif input(pygame.MOUSEBUTTONDOWN, event, 50, 150, 630, 730) == True:
                 bet = 10
-                print(bet)
             elif input(pygame.MOUSEBUTTONDOWN, event, 200, 300, 630, 730) == True:
                 bet = 20
-                print(bet)
             elif input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 630, 730) == True:
                 bet = 50
-                print(bet)
             elif input(pygame.MOUSEBUTTONDOWN, event, 500, 600, 630, 730) == True:
                 bet = 100
             elif input(pygame.MOUSEBUTTONDOWN, event, 650, 750, 630, 730) == True:
@@ -299,7 +356,7 @@ def makeBet():
                 maxwellLimit = 16
 
 
-
+#this function shows the cards
 def showCards(handNum, cardY, center):
     cardAmount = len(hands[handNum].cards)
     hands[handNum].printHand()
@@ -339,7 +396,7 @@ def showCards(handNum, cardY, center):
         textWrite(str(hands[handNum].hand[2]), 50, (0,0,0), 470-center, cardY)
         textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 540-center, cardY)
 
-
+#opening screen
 while opening == True:
 
     clock.tick(27)
@@ -357,10 +414,12 @@ while opening == True:
         if input(pygame.MOUSEBUTTONDOWN, event, 300, 500, 300, 500) == True:
             opening = False
 
+#starting arangements
 resetDeck(4)
 startHand()
 makeBet()
 
+#main game loop
 while game == True:
 
     clock.tick(27)
@@ -380,14 +439,22 @@ while game == True:
         #split
         elif input(pygame.MOUSEBUTTONDOWN, event, 225, 325, 650, 700) == True:
             hands[0].checkSplit()
+            #checks if there are two cards
+            if len(hands[0].cards) == 2:
+                #checks if the cards equal each other
+                if hands[0].cards[0].getCardValue() == hands[0].cards[1].getCardValue():
+                    #checks if the player has enough money
+                    if money > bet*2:
+                        hands[0].checkSplit()
 
         #hit
         elif input(pygame.MOUSEBUTTONDOWN, event, 350, 450, 650, 700) == True:
             if hands[currentHand].getHandValue() < 21 and hands[currentHand].stand == False:
                 hands[currentHand].addCard(deck[0])
                 deck.pop(0)
+                #checks if player has five cards
                 if hands[currentHand].handFive() == True:
-                    win()
+                    winGame()
         
         #stand
         elif input(pygame.MOUSEBUTTONDOWN, event, 475, 575, 650, 700) == True:

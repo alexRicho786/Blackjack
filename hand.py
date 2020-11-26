@@ -80,7 +80,6 @@ class Hand:
     def checkSplit(self):
         self.split = True
 
-
     #when player stands this determines
     #how the other players play
     def multipleHits(self, limit):
