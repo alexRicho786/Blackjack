@@ -328,6 +328,9 @@ def makeBet():
         mx, my = pygame.mouse.get_pos()
         keys = pygame.key.get_pressed()
 
+        win.blit(betImg, [0, 0])
+        textWrite("Make a Bet", 50, (255,255,255), 400, 600)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     chooseBet = False
@@ -372,43 +375,42 @@ def makeBet():
             elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 265, 355) == True:
                 maxwellLimit = 16
 
-            #display user feedback for bet
-            if bet == 10:
-                pygame.draw.rect(win, (0,255,0),(50, 735, 100, 10))
-            elif bet == 20:
-                pygame.draw.rect(win, (0,255,0),(200, 735, 100, 10))
-            elif bet == 50:
-                pygame.draw.rect(win, (0,255,0),(350, 735, 100, 10))
-            elif bet == 100:
-                pygame.draw.rect(win, (0,255,0),(500, 735, 100, 10))
-            elif bet == 200:
-                pygame.draw.rect(win, (0,255,0),(650, 732, 100, 10))
-            
-            #display user feedback for personalities
-            #dealer
-            if dealerLimit == 20:
-                pygame.draw.rect(win, (0,255,0),(310, 195, 110, 10))
-            elif dealerLimit == 18:
-                pygame.draw.rect(win, (0,255,0),(470, 195, 100, 10))
-            elif dealerLimit == 16:
-                pygame.draw.rect(win, (0,255,0),(615, 195, 110, 10))
-            #harmon
-            if harmonButton == 1:
-                pygame.draw.rect(win, (0,255,0),(310, 265, 110, 10))
-            elif harmonButton == 2:
-                pygame.draw.rect(win, (0,255,0),(470, 265, 100, 10))
-            elif harmonButton == 3:
-                pygame.draw.rect(win, (0,255,0),(615, 265, 110, 10))
-            
-            #maxwell
-            if maxwellLimit == 20:
-                pygame.draw.rect(win, (0,255,0),(310, 340, 110, 10))
-            elif maxwellLimit == 18:
-                pygame.draw.rect(win, (0,255,0),(470, 340, 100, 10))
-            elif maxwellLimit == 16:
-                pygame.draw.rect(win, (0,255,0),(615, 340, 110, 10))
+        #display user feedback for bet
+        if bet == 10:
+            pygame.draw.rect(win, (0,255,0),(50, 735, 100, 10))
+        elif bet == 20:
+            pygame.draw.rect(win, (0,255,0),(200, 735, 100, 10))
+        elif bet == 50:
+            pygame.draw.rect(win, (0,255,0),(350, 735, 100, 10))
+        elif bet == 100:
+            pygame.draw.rect(win, (0,255,0),(500, 735, 100, 10))
+        elif bet == 200:
+            pygame.draw.rect(win, (0,255,0),(650, 732, 100, 10))
+        
+        #display user feedback for personalities
+        #dealer
+        if dealerLimit == 20:
+            pygame.draw.rect(win, (0,255,0),(310, 195, 110, 10))
+        elif dealerLimit == 18:
+            pygame.draw.rect(win, (0,255,0),(470, 195, 100, 10))
+        elif dealerLimit == 16:
+            pygame.draw.rect(win, (0,255,0),(615, 195, 110, 10))
+        #harmon
+        if harmonButton == 1:
+            pygame.draw.rect(win, (0,255,0),(310, 265, 110, 10))
+        elif harmonButton == 2:
+            pygame.draw.rect(win, (0,255,0),(470, 265, 100, 10))
+        elif harmonButton == 3:
+            pygame.draw.rect(win, (0,255,0),(615, 265, 110, 10))
+        #maxwell
+        if maxwellLimit == 20:
+            pygame.draw.rect(win, (0,255,0),(310, 340, 110, 10))
+        elif maxwellLimit == 18:
+            pygame.draw.rect(win, (0,255,0),(470, 340, 100, 10))
+        elif maxwellLimit == 16:
+            pygame.draw.rect(win, (0,255,0),(615, 340, 110, 10))
 
-            pygame.display.update()
+        pygame.display.update()
 
 
 #this function shows the cards
