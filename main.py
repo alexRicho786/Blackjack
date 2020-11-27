@@ -1,6 +1,3 @@
-#stuff to add + issues
-#fix split
-
 from card import Card
 from hand import Hand
 from time import sleep
@@ -498,7 +495,6 @@ while game == True:
 
         #split
         elif input(pygame.MOUSEBUTTONDOWN, event, 225, 325, 650, 700) == True:
-            hands[0].checkSplit()
             #checks if there are two cards
             if len(hands[0].cards) == 2:
                 #checks if the cards equal each other
