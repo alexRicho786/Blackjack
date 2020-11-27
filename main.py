@@ -1,7 +1,6 @@
 #stuff to add + issues
-#dealer not hiding card
-#pygame.draw.rect(win, (0,255,0),(50, 730, 100, 10))
-#pygame.display.update()
+#fix split
+
 from card import Card
 from hand import Hand
 from time import sleep
@@ -35,17 +34,19 @@ maxwellLimit = 16
 bet = 50
 game = True
 opening = True
+dealerShow = False
 currentEvent = "Your Turn!"
 money = 1000
 currentHand = 0
 fontObject = pygame.font.SysFont("freesansbold.ttf", 50)
+harmonButton = 1
 
 deck = []
 suits = ["S","C","H","D"]
 faces = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
 values = [11,2,3,4,5,6,7,8,9,10,10,10,10]
 
-
+#creates the deck
 def createDeck():
     for d in range(1, deck_size):
         for s in suits:
@@ -57,6 +58,7 @@ def createDeck():
                 deck.append(card)
 
 
+#shuffles the deck
 def shuffle(deck):
     global shuffle_count
 
@@ -78,6 +80,7 @@ def textWrite(text, size, color, x, y):
     win.blit(textSurface, textRectangle)
 
 
+#redraws the window every frame
 def redrawWindow():
     global money
     #general
@@ -86,23 +89,25 @@ def redrawWindow():
     textWrite(currentEvent, 60, (255,255,255), 150, 40)
     #dealer
     textWrite("Dealer", 60, (255,255,255), 400, 40)
-    showCards(1, 180, 0)
+    showCards(1, 180, 0, dealerShow)
     #player
     textWrite("Cash: " + str(money), 60, (255,255,255), 650, 40)
-    showCards(0, 580, 0)
+    showCards(0, 580, 0, True)
     #other players
-    showCards(2, 320, 225)
-    showCards(3, 320, -225)
+    showCards(2, 320, 225, True)
+    showCards(3, 320, -225, True)
     #split hand
     if hands[0].hasSplit == True:
-        showCards(-1, 450, 0)
+        showCards(-1, 450, 0, True)
     #general events
     playerEvent()
     #update screen
     pygame.display.update()
 
 
+#different events eg: stand, split, hit, etc
 def playerEvent():
+    global dealerShow
     global money
     global bet
     global currentHand
@@ -133,6 +138,7 @@ def playerEvent():
             pygame.display.update()
             sleep(2)
         elif hands[0].hasSplit == False or currentHand == -1:
+            dealerShow = True
             currentEvent = "Dealer's Turn!"
             textWrite(currentEvent, 60, (255,255,255), 150, 70)
             pygame.display.update()
@@ -211,6 +217,7 @@ def playerEvent():
                 makeBet()
                 resetDeck(4)
                 startHand()
+                dealerShow = False
                 hands[currentHand].stand = False
     #forfeit
     if hands[currentHand].forfeit == True:
@@ -253,9 +260,10 @@ def playerEvent():
             hands[0].split = False
 
 
-#when player has five cards
+#when player has five cards they autowin
 def winGame():
     global money
+    #accounting for split
     if hands[0].split == False or currentHand == -1:
         currentEvent = "You Win - 5 cards!"
         textWrite(currentEvent, 60, (255,255,255), 150, 70)
@@ -307,9 +315,12 @@ def makeBet():
     global bet
     global dealerLimit
     global maxwellLimit
-    win.blit(betImg, [0, 0])
+    global harmonButton
     chooseBet = True
-    pygame.display.update()
+
+    win.blit(betImg, [0, 0])
+    textWrite("Make a Bet", 50, (255,255,255), 400, 600)
+    pygame.display.update() 
     
     while chooseBet == True:
 
@@ -318,7 +329,6 @@ def makeBet():
         keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
-            #print(mx, my)
             if event.type == pygame.QUIT:
                     chooseBet = False
                     pygame.quit()
@@ -347,6 +357,13 @@ def makeBet():
                 dealerLimit = 18
             elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 125, 205) == True:
                 dealerLimit = 16
+            #harmon
+            elif input(pygame.MOUSEBUTTONDOWN, event, 310, 410, 190, 270) == True:
+                harmonButton = 1
+            elif input(pygame.MOUSEBUTTONDOWN, event, 470, 570, 190, 270) == True:
+                harmonButton = 2
+            elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 190, 270) == True:
+                harmonButton = 3
             #maxwell
             elif input(pygame.MOUSEBUTTONDOWN, event, 310, 410, 265, 355) == True:
                 maxwellLimit = 20
@@ -355,9 +372,47 @@ def makeBet():
             elif input(pygame.MOUSEBUTTONDOWN, event, 625, 725, 265, 355) == True:
                 maxwellLimit = 16
 
+            #display user feedback for bet
+            if bet == 10:
+                pygame.draw.rect(win, (0,255,0),(50, 735, 100, 10))
+            elif bet == 20:
+                pygame.draw.rect(win, (0,255,0),(200, 735, 100, 10))
+            elif bet == 50:
+                pygame.draw.rect(win, (0,255,0),(350, 735, 100, 10))
+            elif bet == 100:
+                pygame.draw.rect(win, (0,255,0),(500, 735, 100, 10))
+            elif bet == 200:
+                pygame.draw.rect(win, (0,255,0),(650, 732, 100, 10))
+            
+            #display user feedback for personalities
+            #dealer
+            if dealerLimit == 20:
+                pygame.draw.rect(win, (0,255,0),(310, 195, 110, 10))
+            elif dealerLimit == 18:
+                pygame.draw.rect(win, (0,255,0),(470, 195, 100, 10))
+            elif dealerLimit == 16:
+                pygame.draw.rect(win, (0,255,0),(615, 195, 110, 10))
+            #harmon
+            if harmonButton == 1:
+                pygame.draw.rect(win, (0,255,0),(310, 265, 110, 10))
+            elif harmonButton == 2:
+                pygame.draw.rect(win, (0,255,0),(470, 265, 100, 10))
+            elif harmonButton == 3:
+                pygame.draw.rect(win, (0,255,0),(615, 265, 110, 10))
+            
+            #maxwell
+            if maxwellLimit == 20:
+                pygame.draw.rect(win, (0,255,0),(310, 340, 110, 10))
+            elif maxwellLimit == 18:
+                pygame.draw.rect(win, (0,255,0),(470, 340, 100, 10))
+            elif maxwellLimit == 16:
+                pygame.draw.rect(win, (0,255,0),(615, 340, 110, 10))
+
+            pygame.display.update()
+
 
 #this function shows the cards
-def showCards(handNum, cardY, center):
+def showCards(handNum, cardY, center, show):
     cardAmount = len(hands[handNum].cards)
     hands[handNum].printHand()
     if cardAmount == 1:
@@ -367,7 +422,10 @@ def showCards(handNum, cardY, center):
         win.blit(cardTemplate, (355-cardTemplateX-center,cardY-cardTemplateY))
         win.blit(cardTemplate, (445-cardTemplateX-center,cardY-cardTemplateY))
         textWrite(str(hands[handNum].hand[0]), 50, (0,0,0), 355-center, cardY)
-        textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 445-center, cardY)
+        if show == True:
+            textWrite(str(hands[handNum].hand[1]), 50, (0,0,0), 445-center, cardY)
+        else:
+            textWrite("?", 50, (0,0,0), 445-center, cardY)
     elif cardAmount == 3:
         win.blit(cardTemplate, (310-cardTemplateX-center,cardY-cardTemplateY))
         win.blit(cardTemplate, (400-cardTemplateX-center,cardY-cardTemplateY))
